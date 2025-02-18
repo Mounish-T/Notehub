@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:notes/features/crud.dart';
@@ -16,6 +18,7 @@ class AddNoteScreen extends StatefulWidget {
 }
 
 class _AddNoteScreenState extends State<AddNoteScreen> {
+  final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   File? image;
@@ -35,6 +38,7 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
 
   @override
   void initState() {
+    _logAddNotePageVisit();
     titleController.addListener(() {
       if (titleController.text.isNotEmpty) {
         setState(() {
@@ -50,6 +54,13 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
       }
     });
     super.initState();
+  }
+
+  Future<void> _logAddNotePageVisit() async {
+    await analytics.logEvent(
+      name: 'Add_note_page_visit', parameters: {
+      'timestamp': DateTime.now().toIso8601String(),
+    });
   }
 
   Future<void> _pickImage() async {
@@ -141,7 +152,7 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                       if (!(_validate_title ||
                           _validate_description ||
                           _validate_image)) {
-                            showDialog(
+                        showDialog(
                           context: context,
                           barrierDismissible: false,
                           builder: (BuildContext context) {
@@ -161,7 +172,8 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                         final DataService db = DataService();
                         db.createData(new_data);
                         setState(() {
-                          showCustomToast(context, "Successfully added ", new_data.title as String);
+                          showCustomToast(context, "Successfully added ",
+                              new_data.title as String);
                           Navigator.pushNamedAndRemoveUntil(
                             context,
                             '/home',

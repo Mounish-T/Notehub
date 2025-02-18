@@ -1,3 +1,4 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:notes/features/about.dart';
@@ -19,12 +20,15 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, dynamic>> data = [];
   final DataService db = DataService();
 
+  final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+
   final FirebaseAuth _auth = FirebaseAuth.instance;
   User? user;
 
   @override
   void initState() {
     super.initState();
+    _logHomePageVisit();
     user = _auth.currentUser;
     _initializeApp();
   }
@@ -37,6 +41,12 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Future<void> _logHomePageVisit() async {
+    await analytics.logEvent(name: 'Home_page_visit', parameters: {
+      'timestamp': DateTime.now().toIso8601String(),
+    });
+  }
+
   Future<void> _changePassword() async {
     Navigator.push(
       context,
@@ -46,6 +56,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _logout() async {
     await _auth.signOut();
+    analytics.logEvent(name: 'Account_sign_out', parameters: {
+      'timestamp': DateTime.now().toIso8601String(),
+    });
     Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
   }
 
@@ -63,6 +76,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _showLogoutConfirmationDialog() async {
+    analytics.logEvent(name: 'Account_sign_out_bar', parameters: {
+      'timestamp': DateTime.now().toIso8601String(),
+    });
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
@@ -97,6 +113,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _showDeleteAccountConfirmationDialog() async {
+    analytics.logEvent(name: 'Delete_account_bar', parameters: {
+      'timestamp': DateTime.now().toIso8601String(),
+    });
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
@@ -213,6 +232,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                         )));
                           },
                           onLongPress: () {
+                            analytics
+                                .logEvent(name: 'Delete_note_bar', parameters: {
+                              'timestamp': DateTime.now().toIso8601String(),
+                            });
                             showModalBottomSheet(
                                 context: context,
                                 builder: (BuildContext context) {
@@ -259,11 +282,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ElevatedButton(
                                               onPressed: () {
                                                 // Add your delete note logic here
-                                                // if (data[index - 1]['url'] !=
-                                                //     null) {
-                                                //   deleteImage(
-                                                //       data[index - 1]['url']);
-                                                // }
+                                                if (data[index - 1]['url'] !=
+                                                    null) {
+                                                  deleteImage(
+                                                      data[index - 1]['url']);
+                                                }
                                                 final DataService db =
                                                     DataService();
                                                 String delete_data =

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:notes/features/crud.dart';
@@ -20,6 +21,7 @@ class EditNoteScreen extends StatefulWidget {
 }
 
 class _EditNoteScreenState extends State<EditNoteScreen> {
+  final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   String? imageUrl;
@@ -42,6 +44,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
 
   @override
   void initState() {
+    _logEditNotePageVisit();
     setState(() {
       titleController.text = widget.data['title'];
       descriptionController.text = widget.data['description'];
@@ -63,6 +66,12 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
       }
     });
     super.initState();
+  }
+
+  Future<void> _logEditNotePageVisit() async {
+    await analytics.logEvent(name: 'Edit_note_page_visit', parameters: {
+      'timestamp': DateTime.now().toIso8601String(),
+    });
   }
 
   Future<void> _pickImage() async {

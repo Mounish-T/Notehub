@@ -1,8 +1,29 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-class AboutPage extends StatelessWidget {
+class AboutPage extends StatefulWidget {
   const AboutPage({super.key});
+
+  @override
+  _AboutPageState createState() => _AboutPageState();
+}
+
+class _AboutPageState extends State<AboutPage> {
+  final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+
+  @override
+  void initState() {
+    _logAboutPageVisit();
+    super.initState();
+  }
+
+  Future<void> _logAboutPageVisit() async {
+    analytics.logEvent(name: 'About_page_visit', parameters: {
+      'timestamp': DateTime.now().toIso8601String(),
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,12 +53,18 @@ class AboutPage extends StatelessWidget {
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 8.0),
-              _buildFeatureItem(context, Icons.notes, 'Effortless Note Creation'),
-              _buildFeatureItem(context, Icons.cloud_upload, 'Secure Cloud Storage with Firebase and Cloudinary'),
-              _buildFeatureItem(context, Icons.design_services, 'User-Friendly Interface'),
-              _buildFeatureItem(context, Icons.security, 'Robust Email/Password Authentication'),
-              _buildFeatureItem(context, Icons.delete, 'Create, Edit, and Delete Notes'),
-              _buildFeatureItem(context, Icons.offline_bolt, 'Partial Offline Access'),
+              _buildFeatureItem(
+                  context, Icons.notes, 'Effortless Note Creation'),
+              _buildFeatureItem(context, Icons.cloud_upload,
+                  'Secure Cloud Storage with Firebase and Cloudinary'),
+              _buildFeatureItem(
+                  context, Icons.design_services, 'User-Friendly Interface'),
+              _buildFeatureItem(context, Icons.security,
+                  'Robust Email/Password Authentication'),
+              _buildFeatureItem(
+                  context, Icons.delete, 'Create, Edit, and Delete Notes'),
+              _buildFeatureItem(
+                  context, Icons.offline_bolt, 'Partial Offline Access'),
               const SizedBox(height: 16.0),
               Text(
                 'Built With:',
@@ -51,7 +78,9 @@ class AboutPage extends StatelessWidget {
                   Text('Flutter', style: Theme.of(context).textTheme.bodyLarge),
                 ],
               ),
-              SizedBox(height: 20,),
+              SizedBox(
+                height: 20,
+              ),
               Row(
                 children: [
                   Image.asset(
@@ -59,7 +88,8 @@ class AboutPage extends StatelessWidget {
                     height: 24.0,
                   ),
                   const SizedBox(width: 8.0),
-                  Text('Firebase', style: Theme.of(context).textTheme.bodyLarge),
+                  Text('Firebase',
+                      style: Theme.of(context).textTheme.bodyLarge),
                 ],
               ),
               const SizedBox(height: 20.0),
@@ -70,7 +100,8 @@ class AboutPage extends StatelessWidget {
                     height: 24.0,
                   ),
                   const SizedBox(width: 8.0),
-                  Text('Cloudinary', style: Theme.of(context).textTheme.bodyLarge),
+                  Text('Cloudinary',
+                      style: Theme.of(context).textTheme.bodyLarge),
                 ],
               ),
               const SizedBox(height: 16.0),

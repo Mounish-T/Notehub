@@ -1,3 +1,4 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -11,9 +12,11 @@ class ChangePasswordScreen extends StatefulWidget {
 }
 
 class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
+  final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   bool _validatePassword = false;
   bool _validateConfirmPassword = false;
 
@@ -34,11 +37,26 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
     try {
       await _auth.currentUser?.updatePassword(_passwordController.text);
+      analytics.logEvent(name: 'Password_changed', parameters: {
+        'timestamp': DateTime.now().toIso8601String(),
+      });
       showCustomToast(context, "Password changed successfully", "");
       Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       showCustomToast(context, "Error: ${e.message}", "");
     }
+  }
+
+  @override
+  void initState() {
+    _logChangePasswordPageVisit();
+    super.initState();
+  }
+
+  Future<void> _logChangePasswordPageVisit() async {
+    analytics.logEvent(name: 'change_password_page', parameters: {
+      'timestamp': DateTime.now().toIso8601String(),
+    });
   }
 
   @override
@@ -57,7 +75,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               decoration: InputDecoration(
                 labelText: 'New Password',
                 border: OutlineInputBorder(),
-                errorText: _validatePassword ? 'Password cannot be empty' : null,
+                errorText:
+                    _validatePassword ? 'Password cannot be empty' : null,
               ),
               obscureText: true,
             ),
@@ -67,7 +86,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               decoration: InputDecoration(
                 labelText: 'Confirm Password',
                 border: OutlineInputBorder(),
-                errorText: _validateConfirmPassword ? 'Passwords do not match' : null,
+                errorText:
+                    _validateConfirmPassword ? 'Passwords do not match' : null,
               ),
               obscureText: true,
             ),

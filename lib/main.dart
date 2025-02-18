@@ -1,3 +1,4 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:notes/features/auth/auth_pages/login_screen.dart';
@@ -15,6 +16,7 @@ Future<void> main() async {
   runApp(MyApp());
 }
 
+
 class MyApp extends StatefulWidget {
 
   const MyApp({super.key});
@@ -26,6 +28,15 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   List<Map<String, dynamic>> data = [];
   final DataService db = DataService();
+  static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+  static FirebaseAnalyticsObserver observer =
+      FirebaseAnalyticsObserver(analytics: analytics);
+
+  @override
+  void initState() {
+    analytics.setAnalyticsCollectionEnabled(true);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +52,7 @@ class _MyAppState extends State<MyApp> {
         '/addNote': (context) => AddNoteScreen(),
       },
       initialRoute: '/',
+      navigatorObservers: <NavigatorObserver>[observer],
     );
   }
 }
