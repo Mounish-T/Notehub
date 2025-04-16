@@ -132,4 +132,40 @@ class DataService {
       'timestamp': DateTime.now().toIso8601String(),
     });
   }
+
+  Future<List<Map<String, dynamic>>> getLast24HoursLogins() async {
+    DateTime last24Hours = DateTime.now().subtract(Duration(hours: 24));
+
+    QuerySnapshot snapshot = await _firestore
+        .collection('user_logins')
+        .where('timestamp', isGreaterThan: last24Hours.millisecondsSinceEpoch)
+        .get();
+
+    List<Map<String, dynamic>> fetchedData = [];
+
+    for (QueryDocumentSnapshot doc in snapshot.docs) {
+      Map<String, dynamic> documentData = doc.data() as Map<String, dynamic>;
+      fetchedData.add(documentData);
+    }
+
+    return fetchedData;
+  }
+
+  Future<List<Map<String, dynamic>>> getLast24Hourssignups() async {
+    DateTime last24Hours = DateTime.now().subtract(Duration(hours: 24));
+
+    QuerySnapshot snapshot = await _firestore
+        .collection('user_signups')
+        .where('timestamp', isGreaterThan: last24Hours.millisecondsSinceEpoch)
+        .get();
+
+    List<Map<String, dynamic>> fetchedData = [];
+
+    for (QueryDocumentSnapshot doc in snapshot.docs) {
+      Map<String, dynamic> documentData = doc.data() as Map<String, dynamic>;
+      fetchedData.add(documentData);
+    }
+
+    return fetchedData;
+  }
 }

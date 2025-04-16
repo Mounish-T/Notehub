@@ -6,6 +6,7 @@ import 'package:notes/features/crud.dart';
 import 'package:notes/features/image_process.dart';
 import 'package:notes/features/toast.dart';
 import 'package:notes/screens/edit_note_screen.dart';
+import 'package:intl/intl.dart';
 
 import '../features/auth/auth_pages/change_password.dart';
 
@@ -150,6 +151,11 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  String formatTimestamp(int timestamp) {
+    var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+    return DateFormat('yyyy-MM-dd HH:mm:ss').format(date);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -168,6 +174,31 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.print),
+            onPressed: () async {
+              List<Map<String, dynamic>> signups =
+                  await db.getLast24Hourssignups();
+
+              print("The Last 24 hours signups are: \n");
+              for (Map<String, dynamic> signup in signups) {
+                print(
+                    "User: ${signup['user_id']}, Timestamp: ${formatTimestamp(signup['timestamp'])}\n");
+              }
+              print("\n");
+
+              List<Map<String, dynamic>> logins =
+                  await db.getLast24HoursLogins();
+              print("The Last 24 hours logins are: \n");
+              for (Map<String, dynamic> login in logins) {
+                print(
+                    "User: ${login['user_id']}, Timestamp: ${formatTimestamp(login['timestamp'])}\n");
+              }
+              print("\n");
+            },
+          ),
+        ],
       ),
       body: data.isEmpty
           ? Center(

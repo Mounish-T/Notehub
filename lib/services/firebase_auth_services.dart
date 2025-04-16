@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ class FirebaseAuthServices {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<User?> signUpWithEmailAndPassword(
       BuildContext context, String email, String password) async {
@@ -20,8 +22,14 @@ class FirebaseAuthServices {
           'timestamp' : DateTime.now().toIso8601String(),
         }
       );
+      await _firestore.collection('user_signups').add({
+        'user_id': email,
+        'timestamp': DateTime.now().millisecondsSinceEpoch,
+      });
       return userCredential.user;
-    } on FirebaseAuthException catch (e) {
+    } 
+    
+    on FirebaseAuthException catch (e) {
       if (e.code == 'invalid-email') {
         showCustomToast(context, "The email address is invalid", "");
       }
@@ -46,8 +54,14 @@ class FirebaseAuthServices {
         'email': email,
         'timestamp': DateTime.now().toIso8601String(),
       });
+      await _firestore.collection('user_logins').add({
+        'user_id': email,
+        'timestamp': DateTime.now().millisecondsSinceEpoch,
+      });
       return userCredential.user;
-    } on FirebaseAuthException catch (e) {
+    } 
+    
+    on FirebaseAuthException catch (e) {
       if (e.code == 'invalid-email') {
         showCustomToast(context, "The email address is invalid", "");
       } else if (e.code == 'user-not-found' ||
